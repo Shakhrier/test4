@@ -39,7 +39,8 @@ module.exports.highGPA=function(){
         students.forEach(element => {
             if(element.gpa>highest){
                 highest=element.gpa
-                student = element;
+                student=[];
+                student.push(element);
             }
         });
         console.log(student);
@@ -56,3 +57,4 @@ module.exports.highGPA=function(){
         }
     })
 }
+

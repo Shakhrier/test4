@@ -8,7 +8,7 @@ app.get("/",(req,res)=>{
     res.sendFile(path.join(__dirname, "home.html"));
 })
 
-app.get("/students.json",(req,res)=>{
+app.get("/cpa",(req,res)=>{
     dataService.cpa()
     .then(function(data){
         res.send(JSON.stringify(data));
@@ -18,10 +18,10 @@ app.get("/students.json",(req,res)=>{
     })
 })
 
-app.get("/students.json",(req,res)=>{
+app.get("/highGPA",(req,res)=>{
     dataService.highGPA()
     .then(function(data){
-        res.send(data);
+        res.send(JSON.stringify(data));
     })
     .catch(function(reason){
         res.send(reason);
