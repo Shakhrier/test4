@@ -1,9 +1,9 @@
 var students = [];
 var fs=require("fs");
 
-module.exports.initialize=function(){
+module.exports.prep=function(){
     return new Promise((resolve,reject)=>{
-        fs.readFile('/students.json',(err,data)=>{
+        fs.readFile('./students.json',(err,data)=>{
             if (err) reject("unable to read file");
             students = JSON.parse(data);
         })
@@ -14,9 +14,16 @@ module.exports.initialize=function(){
     });
 }
 
-module.exports.cpa()=function(){
+module.exports.cpa=function(){
     return new Promise((resolve,reject)=>{
-        if(students.length!=0){
+        let CPA=[];
+        students.forEach(element=>{
+            if(element.program==="CPA"){
+                CPA.push(element);
+            }
+        })
+
+        if(CPA.length!=0){
             resolve(students);
         }
         else{
@@ -25,7 +32,7 @@ module.exports.cpa()=function(){
     })
 }
 
-module.exports.highGPA()=function(){
+module.exports.highGPA=function(){
     return new Promise((resolve,reject)=>{
         let highest=0;
         let student=[];
@@ -35,8 +42,14 @@ module.exports.highGPA()=function(){
                 student = element;
             }
         });
+        console.log(student);
         if(highest!=0){
-            resolve(student);
+            let text="<h1>Highest GPA:</h1><br>";
+            text+='<p>Student ID:',student.studId ,'</p></br>';
+            text+='<p>Name:', student.name,'</p><br>';
+            text+='<p>Program:', student.program,'</p><br>';
+            text+='<p>GPA:', student.gpa,'</p>';
+            resolve(text);
         }
         else{
             reject("Failed finding the student with the highest GPA");
