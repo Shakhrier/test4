@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Add new Student</title>
+</head>
+<body>
+    <h2>Add Student</h2>
+    <br>
+	<div style="border:solid 1px">
+		Student Information
+		<form action="/data_prep.js" method="post">
+			Student ID: <input type="text" id="StudID">
+			Student Name: <input type="text" id="Name"> 
+		<label for="program">Choose program:</label>
+
+	<select name="program" id="programs">
+  		<option value="BSD">BSD</option>
+  		<option value="CPA">CPA</option>
+  		<option value="DSA">DSA</option>
+	</select>
+	GPA:<input type="text" id="GPA">
+
+		<p> <input type = "submit" value = "Submit"> 
+			<input type = "reset"> </p>
+	</form>
+	</div>
+</body>
+</html>

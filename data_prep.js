@@ -1,60 +1,83 @@
-var students = [];
-var fs=require("fs");
-
-module.exports.prep=function(){
-    return new Promise((resolve,reject)=>{
-        fs.readFile('./students.json',(err,data)=>{
-            if (err) reject("unable to read file");
+var fs = require("fs");
+const { resolve } = require("path");
+var students=[];
+exports.prep = ()=>{
+   // console.log("Testing");
+   return new Promise((resolve, reject)=>{
+        fs.readFile("./students.json", (err, data)=>{
+            if (err) {reject("unable to read file.");}
             students = JSON.parse(data);
-        })
-    
-        
-    resolve("Data was read successfully");
-        
+           // console.log(students);
+            resolve("File read success.");
+        }); 
+   });
+};
+
+exports.cpa = ()=>{
+    return new Promise((resolve, reject)=>{
+       let results = students.filter(student => student.program == "CPA");
+       (results.length == 0)? reject("No CPA students."):resolve(results);
     });
 }
-
-module.exports.cpa=function(){
-    return new Promise((resolve,reject)=>{
-        let CPA=[];
-        students.forEach(element=>{
-            if(element.program==="CPA"){
-                CPA.push(element);
+exports.highGPA = ()=>{
+    return new Promise((resolve, reject)=>{
+        let high = 0;
+        let highStudent;
+        
+        for (let i=0; i<students.length; i++)
+        {
+            //console.log(students[i].gpa, high);
+            if (students[i].gpa > high)
+            {
+                high = students[i].gpa;
+                highStudent = students[i];
             }
-        })
+        }
+        (highStudent) ? resolve(highStudent): reject("Failed finding student with highest GPA");
+    }); 
+};
 
-        if(CPA.length!=0){
-            resolve(students);
+exports.allStudents=()=>{
+    return new Promise((resolve,reject)=>{
+        if(students.length>0){
+            resolve(students)
         }
         else{
-            reject("no results returned");
+            reject("no results returned")
         }
-    })
-}
+    });
+};
 
-module.exports.highGPA=function(){
+exports.addStudent=(data)=>{
     return new Promise((resolve,reject)=>{
-        let highest=0;
-        let student=[];
-        students.forEach(element => {
-            if(element.gpa>highest){
-                highest=element.gpa
-                student=[];
-                student.push(element);
-            }
-        });
-        console.log(student);
-        if(highest!=0){
-            let text="<h1>Highest GPA:</h1><br>";
-            text+='<p>Student ID:',student.studId ,'</p></br>';
-            text+='<p>Name:', student.name,'</p><br>';
-            text+='<p>Program:', student.program,'</p><br>';
-            text+='<p>GPA:', student.gpa,'</p>';
-            resolve(text);
-        }
-        else{
-            reject("Failed finding the student with the highest GPA");
-        }
-    })
-}
+        let name = data.querySelector("#name");
+        let id = data.querySelector("#studID");
+        let program = data.querySelector("#programs");
+        let gpa = data.querySelector("#GPA");
+        let element = {"studId": parseInt(id),
+        "name": name,
+        "program": program,
+        "gpa": parseFloat(gpa)
+      }
+      students.push(element);
+      if(element.length>0){
+        resolve(students);
+      }
+      else{
+        reject("Error!");
+      }
+    });
+};
 
+exports.getStudent=(studID)=>{
+    return new Promise((resolve,reject)=>{
+        for(let i=0;i<students.length;i++){
+            if(studID==students[i].studId){
+                resolve(studID);
+            }
+            else{
+                reject("Student was not found!");
+            }
+        }
+    });
+};
