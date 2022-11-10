@@ -1,89 +1,178 @@
 var express = require("express");
+
 var app = express();
-var path = require("path");
-const { stringify } = require("querystring");
+
 var data_prep = require("./data_prep.js");
 
+var path = require("path");
+
+const { engine }=require('express-handlebars');
+
+
+
+app.use(express.json());
+
+app.use(express.urlencoded({extended: true}));
+
+app.engine(".hbs",engine({
+    extname:".hbs",
+    defaultLayout:"main",
+    helpers:{
+        navLink: function(url, options){
+        return '<li' +
+        ((url == app.locals.activeRoute) ? ' class="active" ' : '') +
+        '><a href=" ' + url + ' ">' + options.fn(this) + '</a></li>';
+       },
+       equal: function (lvalue, rvalue, options) {
+        if (arguments.length < 3)
+        throw new Error("Handlebars Helper equal needs 2 parameters");
+        if (lvalue != rvalue) {
+        return options.inverse(this);
+        } else {
+        return options.fn(this);
+        }
+       } 
+    }
+}))
+
+app.set("view engine",".hbs")
+
 var HTTP_PORT = process.env.PORT || 8080;
+
 function onHttpStart() 
+
 {
+
     console.log("Express http server listening on " + HTTP_PORT);
+
 }
 
+
+
 app.get("/",(req,res)=>{
-    res.sendFile(path.join(__dirname, "home.html"));
+
+    res.render("home");
+
 });
+
+
+
+app.get("/BSD", (req,res)=>{
+
+    data_prep.bsd().then((data)=>{
+
+        const students=Object.values(data);
+        res.render("allstudents",{students:students});
+
+    }).catch(function(data){
+        res.render({message: "no results"});
+    });
+
+});
+
+
 
 app.get("/CPA", (req,res)=>{
+
     data_prep.cpa().then((data)=>{
-        res.json(data);
-    }).catch((reason)=>{
-        res.json({message:reason});
+        res.render("student",{data:data});
+
+    }).catch(function(data){
+        res.render({message: "no results"});
     });
+
 });
+
+
 
 app.get("/highGPA", (req, res)=>{
+
     data_prep.highGPA().then((data)=>{
-        let resText = `<h2> Highest GPA: </h2>
-        <p> Student ID: ${data.studId} </p>
-        <p> Name:  ${data.name} </p>
-        <p> Program: ${data.program} </p>
-        <p> GPA: ${data.gpa} </p> `;
-        res.send(resText);
+        res.render("Gstudent",{data:data});
+
+    }).catch(function(data){
+        res.render({message: "no results"});
     });
+
 });
 
-app.get("/allstudents",(req,res)=>{
+
+
+app.get("/allStudents", (req, res)=>{
+
     data_prep.allStudents().then((data)=>{
-        res.send(data);
-    })
-})
+        const students=Object.values(data);
+        res.render("allstudents",{students:students});
 
-app.get("/newStudent",(req,res)=>{
-    res.sendFile(path.join(__dirname, "addStudent.html"));
-})
-
-app.post("/newStudent",(req,res)=>{
-    const newData=req.body
-    data_prep.addStudent(stringify(req.body)).then((data)=>{
-        let resText=`<h2 style="color: red"> This student Information </h2>
-        <p> Student ID: ${data.studId} </p>
-        <p> Name:  ${data.name} </p>
-        <p> Program: ${data.program} </p>
-        <p> GPA: ${data.gpa} </p> 
-        <a role="link" href="/">Go home</a>
-    <br>
-    <a role="link" href="/allstudents">Click to see All Students</a>
-    <br>`;
-        res.send(resText);
+    }).catch(function(data){
+        res.render({message: "no results"});
     });
 
-})
+});
 
-app.get("/getStudent/:3",(req,res)=>{
-    console.log(req.params);
-    data_prep.getStudent(res.json(req.params)).then((data)=>{
-        let resText=`<h2 style="color: red"> This student Information </h2>
-        <p> Student ID: ${data.studId} </p>
-        <p> Name:  ${data.name} </p>
-        <p> Program: ${data.program} </p>
-        <p> GPA: ${data.gpa} </p> 
-        <a role="link" href="/">Go home</a>
-    <br>
-    <a role="link" href="/allstudents">Click to see All Students</a>
-    <br>`;
-        res.send(resText);
-    })
-})
+
+
+app.get("/addStudent", (req, res)=>{
+
+    res.sendFile(path.join(__dirname, "/views/addStudent.html"));
+
+});
+
+
+
+app.post("/addStudent", (req, res)=>{
+
+    data_prep.addStudent(req.body).then(()=>{
+
+        var students = req.body;
+
+        res.render("student",{students:students})
+
+        //res.redirect("/allStudents");
+
+
+
+    }).catch(function(data){
+        res.render({message: "no results"});
+    });
+
+});
+
+
+
+app.get("/student/:studId",(req, res)=>{
+
+    data_prep.getStudent(req.params.studId).then((data)=>{
+        res.render("student",{data:data});
+
+       // res.json(data);
+
+       // {"studId":3,"name":"name3","program":"BSD","gpa":3.3}
+
+    }).catch(function(data){
+        res.render({message: "no results"});
+    });
+
+});
+
 
 
 app.get("*", (req, res)=>{
+
     res.status(404).send("Error 404: page not found.")
-})
+
+});
+
+
 
 data_prep.prep().then((data)=>{
+
     //console.log(data);
+
     app.listen(HTTP_PORT, onHttpStart);
+
 }).catch((err)=>{
+
     console.log(err);
+
 });
