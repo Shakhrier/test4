@@ -1,41 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Home</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test4</title>
 </head>
 <body>
-    
 
-{{#navLink "/"}}Home{{/navLink}}
-                    {{#navLink "/CPA"}}CPA students{{/navLink}}
-
-                    {{#navLink "/allstudents"}}All Students{{/navLink}}
-                    {{#navLink "/addStudent"}}Add a new student{{/navLink}}
-                
-                
-                    {{#navLink "/highGPA"}}Highest GPA{{/navLink}}
-                   
-
-
+    <ul>
+        <li> <a href = "/CPA"> CPA Students </a></li>
+        <li> <a href = "/allStudents"> All Students </a></li>
+        <li> <a href = "/addStudent"> Add A New Student </a></li>
+        <li> Note: Locate specific student by student Id, e.g., <br>
+            http://localhost:8080/student/3 </li>  
+        <li> <a href = "/highGPA"> Highest GPA </a></li>
+        <li><a href="/">Home</a></li>  
+    </ul>
     <hr>
-        {{{body}}}
+    {{{body}}}
     <hr>
-
-<h3> Student Honor Pledge</h3>
-
-    <p>I acknowledge the College's academic integrity policy - and my own integrity - remain in effect whether my work is
-        done remotely or onsite. Any test or assignment in an act of trust between me and my instructor, and especially width
-        my classmates...even when no one is watching. I declare I will not break that trust.
-    </p>
-
-
-    <div>Name: <div style="background-color: yellow;">Shakhrier Talibzhanov</div></div>
-
-
-    <div>Student Number: <div style="background-color: yellow;"> 107585218 </div></div>
-
-
+    <h2>Student Honour Pledge:</h2>
+    <p>I acknowledge Seneca College’s academic integrity policy. <br>
+        On my honor, I have neither given or received unauthorized aid on this test.</p>
+    <p>Name: <mark> <b> Shakhrier Talibzhanov </b> </mark> </p>
+    <p>Student Number: <mark><b> 107585218 </b> </mark>
 </body>
 </html>

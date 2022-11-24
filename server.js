@@ -1,3 +1,13 @@
+/** I declare that this assignment is my own work in accordance with Seneca Academic Policy.
+No part of this assignment has been copied manually or electronically from any other source.
+* (including 3rd party web sites) or distributed to other students.
+*
+* Name: Shakhrier Talibzhanov Student ID: 107585218 Date: 10.26.2022
+*
+* Your app’s URL (from Cyclic Heroku) that I can click to see your application:
+* https://tame-pink-millipede-cap.cyclic.app
+*/
+
 var express = require("express");
 
 var app = express();
@@ -75,7 +85,8 @@ app.get("/BSD", (req,res)=>{
 app.get("/CPA", (req,res)=>{
 
     data_prep.cpa().then((data)=>{
-        res.render("student",{data:data});
+        console.log(data);
+        res.render("students",{data:data});
 
     }).catch(function(data){
         res.render({message: "no results"});
@@ -88,7 +99,8 @@ app.get("/CPA", (req,res)=>{
 app.get("/highGPA", (req, res)=>{
 
     data_prep.highGPA().then((data)=>{
-        res.render("Gstudent",{data:data});
+        console.log(data);
+        res.render("student",{data:data});
 
     }).catch(function(data){
         res.render({message: "no results"});
@@ -100,9 +112,9 @@ app.get("/highGPA", (req, res)=>{
 
 app.get("/allStudents", (req, res)=>{
 
-    data_prep.allStudents().then((data)=>{
-        const students=Object.values(data);
-        res.render("allstudents",{students:students});
+    data_prep.allStudents()
+    .then((data)=>{
+        res.render("students",{data:data});
 
     }).catch(function(data){
         res.render({message: "no results"});
@@ -124,9 +136,9 @@ app.post("/addStudent", (req, res)=>{
 
     data_prep.addStudent(req.body).then(()=>{
 
-        var students = req.body;
+        var data = req.body;
 
-        res.render("student",{students:students})
+        res.render("students",{data:data})
 
         //res.redirect("/allStudents");
 

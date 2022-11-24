@@ -1,24 +1,46 @@
-var fs = require("fs");
+const { stdin } = require('process');
+const Sequelize = require('sequelize');
+var sequelize = new Sequelize('gherwrnv', 'gherwrnv', 'f_YEvXAYVkQZ8IdzXJN48YJ92qhEy9nr', {
+ host: 'peanut.db.elephantsql.com',
+ dialect: 'postgres',
+ port: 5432,
+ dialectOptions: {
+ ssl: true
+},
+query:{raw: true} // update here, you. Need this
+});
 
-var students=[];
+sequelize
+    .authenticate()
+    .then(function() {
+        console.log('Connection has been established successfully.');
+    })
+    .catch(function(err) {
+        console.log('Unable to connect to the database:', err);
+    });
+
+var Student=sequelize.define('Student',{
+    studId:{
+        type:Sequelize.INTEGER,
+    primaryKey:true,
+    autoIncrement:true
+    },
+    name: Sequelize.STRING,
+    program:Sequelize.STRING,
+    gpa:Sequelize.FLOAT
+})
 
 exports.prep = ()=>{
 
-   // console.log("Testing");
-
    return new Promise((resolve, reject)=>{
 
-        fs.readFile("./students.json", (err, data)=>{
-
-            if (err) {reject("unable to read file.");}
-
-            students = JSON.parse(data);
-
-           // console.log(students);
-
-            resolve("File read success.");
-
-        }); 
+    sequelize.sync()
+    .then(function(){
+        resolve("Success!");
+    })
+    .catch(function(){
+        reject("unable to sync the database");
+    })
 
    });
 
@@ -29,10 +51,6 @@ exports.prep = ()=>{
 exports.bsd = ()=>{
 
     return new Promise((resolve, reject)=>{
-
-       let results = students.filter(student => student.program == "BSD");
-
-       (results.length == 0)? reject("No BSD students."):resolve(results);
 
     });
 
@@ -45,11 +63,18 @@ exports.bsd = ()=>{
 exports.cpa = ()=>{
 
     return new Promise((resolve, reject)=>{
+        Student.findAll({
+            where:{
+                program:'CPA'
+            }
 
-       let results = students.filter(student => student.program == "CPA");
-
-       (results.length == 0)? reject("No CPA students."):resolve(results);
-
+        })
+        .then(
+            resolve(Student.findAll({where:{program:'CPA'}}))
+        )
+        .catch(
+            reject("no results found")
+        )
     });
 
 }
@@ -57,33 +82,20 @@ exports.cpa = ()=>{
 exports.highGPA = ()=>{
 
     return new Promise((resolve, reject)=>{
-
-        let high = 0;
-
-        let highStudent;
-
-        
-
-        for (let i=0; i<students.length; i++)
-
-        {
-
-            //console.log(students[i].gpa, high);
-
-            if (students[i].gpa > high)
-
-            {
-
-                high = students[i].gpa;
-
-                highStudent = students[i];
-
-            }
-
-        }
-
-        (highStudent) ? resolve(highStudent): reject("Failed finding student with highest GPA");
-
+        Student.findAll({
+            attributes:[
+                [sequelize.fn('max', sequelize.col('gpa')), 'gpa']],
+          })
+        .then(
+            resolve(Student.findAll({
+                attributes:
+                [
+                    [sequelize.fn('max', sequelize.col('gpa')), 'gpa']]
+              }))
+        )
+        .catch(
+            reject("no results returned")
+        )
     }); 
 
 };
@@ -126,13 +138,13 @@ exports.allStudents =()=>{
 
     return new Promise((resolve, reject)=>{
 
-        if (students.length>0)
-
-        {
-
-            resolve(students);
-
-        } else reject("No students.");
+        Student.findAll()
+        .then(
+            resolve(Student.findAll())
+        )
+        .catch(
+            reject("no results found")
+        )
 
     })
 
@@ -143,12 +155,21 @@ exports.allStudents =()=>{
 exports.addStudent= (stud)=>{
 
     return new Promise((resolve, reject)=>{
+        
+        for(let i in stud){
+            if(stud[i]===""){
+                stud[i]=null;
+                console.log(stud[i]);
+            }
+        }
 
-        stud.studId = students.length+1;
-
-        students.push(stud);
-
-        resolve();
+        Student.create(stud)
+        .then(
+            resolve(Student.findAll())
+        )
+        .catch(
+            reject("unable to create student")
+        )
 
     });
 
